@@ -24,7 +24,7 @@
 
 library IEEE;
 use IEEE.std_logic_1164.ALL;
-
+use IEEE.numeric_std.all;
 --The IEEE.std_logic_unsigned contains definitions that allow 
 --std_logic_vector types to be used with the + operator to instantiate a 
 --counter.
@@ -34,6 +34,7 @@ use IEEE.std_logic_unsigned.all;
 entity P998_UART is
     Port ( BTN 			: in   std_logic_vector(4 downto 0);
            CLK 			: in   std_logic;
+           SW           : in std_Logic_vector(15 downto 0);
            UART_TXD 	: out  std_logic);
 end P998_UART;
 
@@ -101,7 +102,7 @@ constant TMR_VAL_MAX : std_logic_vector(3 downto 0) := "1001"; --9
 
 constant RESET_CNTR_MAX : std_logic_vector(17 downto 0) := "110000110101000000";-- 100,000,000 * 0.002 = 200,000 = clk cycles per 2 ms
 
-constant MAX_STR_LEN : integer := 66;
+constant MAX_STR_LEN : integer := 86;
 
 constant WELCOME_STR_LEN : natural := 27;
 
@@ -137,194 +138,91 @@ constant WELCOME_STR : CHAR_ARRAY(0 to 26) := (X"0A",  --\n
 															  
 --Button press string definition.
 
-constant BTND_STR : CHAR_ARRAY(0 to 31) := (X"59",  --Y
-															  X"6F",  --o
+constant INTRO : CHAR_ARRAY(0 to 49) := (X"54",  --T
+															  X"68",  --h
+															  X"65",  --e
+															  X"20",  --
+															  X"76",  --v
+															  X"61",  --a
+															  X"6C",  --l
 															  X"75",  --u
-															  X"20",  -- 
+															  X"65",  --e
+															  X"20",  --10
+															  X"72",  --r
+															  X"65",  --e
 															  X"70",  --p
 															  X"72",  --r
 															  X"65",  --e
 															  X"73",  --s
-															  X"73",  --s
-															  X"65",  --e10
-															  X"64",  --d
-															  X"20",  -- 
-															  X"42",  --B
-															  X"54",  --T
-															  X"4E",  --N
-															  X"44",  --D
-															  x"20",  -- 
-															  x"28",  --(
-															  x"44",  --D
-															  x"6F",  --o20
-															  x"77",  --w
-															  x"6E",  --n
-															  x"20",  -- 
-															  x"62",  --b
-															  X"75",  --u
-															  X"74",  --t
-															  X"74",  --t
-															  X"6F",  --o
+															  X"65",  --e
 															  X"6E",  --n
-															  X"29",  --)30
+															  X"74",  --t
+															  X"65",  --e20
+															  X"64",  --d
+															  X"20",  --
+															  X"62",  --b
+															  X"79",  --y
+															  X"20",  --
+															  X"31",  --1
+															  X"36",  --6
+															  X"20",  --
+															  X"73",  --s
+															  X"77",  --w30
+															  X"69",  --i
+															  X"74",  --t
+															  X"63",  --c
+															  X"68",  --h
+															  X"65",  --e
+															  X"73",  --s
+															  X"20",  --
+															  X"69",  --i
+															  X"73",  --s
+															  X"20",  --:40
 															  X"0A",  --\n
-															  X"0D"); --\r33
+															  X"0D",  --\r
+															  X"42",  --B
+															  X"69",  --i
+															  X"6E",  --n
+															  X"61",  --a
+															  X"72",  --r
+															  X"79",  --y
+															  X"3A",  --:
+															  X"20");  --50
 															  
-constant BTNU_STR : CHAR_ARRAY(0 to 29) :=															  ------------
-															  (X"59",  --Y
-															  X"6F",  --o
-															  X"75",  --u
-															  X"20",  -- 
-															  X"70",  --p
-															  X"72",  --r
-															  X"65",  --e
-															  X"73",  --s
-															  X"73",  --s
-															  X"65",  --e
-															  X"64",  --d
-															  X"20",  -- 
-															  X"42",  --B
-															  X"54",  --T
-															  X"4E",  --N
-															  X"55",  --U
-															  x"20",  -- 
-															  x"28",  --(
-															  x"55",  --U
-															  x"70",  --p
-															  x"20",  -- 
-															  x"62",  --b
-															  X"75",  --u
-															  X"74",  --t
-															  X"74",  --t
-															  X"6F",  --o
-															  X"6E",  --n
-															  X"29",  --)
-															  X"0A",  --\n
-															  X"0D"); --\r
-															  
-constant BTNL_STR : CHAR_ARRAY(0 to 31) :=															  ------------
-															  (X"59",  --Y
-															  X"6F",  --o
-															  X"75",  --u
-															  X"20",  -- 
-															  X"70",  --p
-															  X"72",  --r
-															  X"65",  --e
-															  X"73",  --s
-															  X"73",  --s
-															  X"65",  --e
-															  X"64",  --d
-															  X"20",  -- 
-															  X"42",  --B
-															  X"54",  --T
-															  X"4E",  --N
-															  X"4C",  --L
-															  x"20",  -- 
-															  x"28",  --(
-															  x"4C",  --L
-															  x"65",  --e
-															  x"66",  --f
-															  x"74",  --t
-															  x"20",  -- 
-															  x"62",  --b
-															  X"75",  --u
-															  X"74",  --t
-															  X"74",  --t
-															  X"6F",  --o
-															  X"6E",  --n
-															  X"29",  --)
-															  X"0A",  --\n
-															  X"0D"); --\r
-															 
-constant BTNR_STR : CHAR_ARRAY(0 to 32) :=											  ------------
-															  (X"59",  --Y
-															  X"6F",  --o
-															  X"75",  --u
-															  X"20",  -- 
-															  X"70",  --p
-															  X"72",  --r
-															  X"65",  --e
-															  X"73",  --s
-															  X"73",  --s
-															  X"65",  --e
-															  X"64",  --d
-															  X"20",  -- 
-															  X"42",  --B
-															  X"54",  --T
-															  X"4E",  --N
-															  X"52",  --R
-															  x"20",  -- 
-															  x"28",  --(
-															  x"52",  --R
-															  x"69",  --i
-															  x"67",  --g
-															  x"68",  --h
-															  x"74",  --t
-															  x"20",  -- 
-															  x"62",  --b
-															  X"75",  --u
-															  X"74",  --t
-															  X"74",  --t
-															  X"6F",  --o
-															  X"6E",  --n
-															  X"29",  --)
-															  X"0A",  --\n
-															  X"0D"); --\r
-															  
-constant BTN_START : CHAR_ARRAY(0 to 14) := (X"59",  --Y
-															  X"6F",  --o
-															  X"75",  --u
-															  X"20",  -- 
-															  X"70",  --p
-															  X"72",  --r
-															  X"65",  --e
-															  X"73",  --s
-															  X"73",  --s
-															  X"65",  --e
-															  X"64",  --d
-															  X"20",  -- 
-															  X"42",  --B
-															  X"54",  --T
-															  X"4E");  --N
-															  
-constant BTN_END : CHAR_ARRAY(0 to 9) := (x"20",  -- 
-															  x"62",  --b
-															  X"75",  --u
-															  X"74",  --t
-															  X"74",  --t
-															  X"6F",  --o
-															  X"6E",  --n
-															  X"29",  --)
-															  X"0A",  --\n
-															  X"0D"); --\r
-constant BTND_SAVE : CHAR_ARRAY(0 to 6) := (X"44",  --D
-															  x"20",  -- 
-															  x"28",  --(
-															  x"44",  --D
-															  x"6F",  --o20
-															  x"77",  --w
-															  x"6E");  --n
-constant BTNU_SAVE: CHAR_ARRAY(0 to 4) := (X"55",  --U
-															  x"20",  -- 
-															  x"28",  --(
-															  x"55",  --U
-															  x"70");  --p
-constant BTNL_SAVE : CHAR_ARRAY(0 to 6) := (X"4C",  --L
-															  x"20",  -- 
-															  x"28",  --(
-															  x"4C",  --L
-															  x"65",  --e
-															  x"66",  --f
-															  x"74");  --t
-constant BTNR_SAVE : CHAR_ARRAY(0 to 7)	 := (X"52",  --R
-															  x"20",  -- 
-															  x"28",  --(
-															  x"52",  --R
-															  x"69",  --i
-															  x"67",  --g
-															  x"68",  --h
-															  x"74");  --t
+constant SPACE : CHAR_ARRAY(0 to 1) := (X"20", -- 
+                                        X"20"); --
+constant LineBreak : CHAR_ARRAY(0 to 1) := (X"0A", --\n
+                                            X"0D"); --\r
+constant HexValue : CHAR_ARRAY(0 to 5) := (X"48", --H
+                                           X"65", --e
+                                           X"78", --x
+                                           X"3A", --:
+                                           X"20", --
+                                           X"20"); --
+signal reverseSW : std_logic_vector(0 to 15) := SW(15 downto 0);                                        
+signal BinString : CHAR_ARRAY(0 to 15);
 
+constant Hex : CHAR_ARRAY(0 to 15) := (X"30", --0
+                                       X"31", --1
+                                       X"32", --2
+                                       X"33", --3
+                                       X"34", --4
+                                       X"35", --5
+                                       X"36", --6
+                                       X"37", --7
+                                       X"38", --8
+                                       X"39", --9
+                                       X"41", --A
+                                       X"42", --B
+                                       X"43", --C
+                                       X"44", --D
+                                       X"45", --E
+                                       X"46"); --F
+                                       
+signal Hex1 : integer;
+signal Hex2 : integer;
+signal Hex3 : integer;
+signal Hex4 : integer;
 --Contains the current string being sent over uart.
 signal sendStr : CHAR_ARRAY(0 to (MAX_STR_LEN - 1));
 
@@ -454,6 +352,17 @@ begin
 			when WAIT_BTN =>
 				if (btnDetect = '1') then
 					uartState <= LD_BTN_STR;
+					for I in 0 to 15 loop
+		               if(reverseSW(I) = '1') then
+		                  BinString(I) <= x"31";
+		              else
+		                  BinString(I) <= x"30";
+		              end if;
+		            end loop;
+		            Hex1 <= to_integer(unsigned(SW(15 downto 12)));
+		            Hex2 <= to_integer(unsigned(SW(11 downto 8)));
+		            Hex3 <= to_integer(unsigned(SW(7 downto 4)));
+		            Hex4 <= to_integer(unsigned(SW(3 downto 0)));	              
 				end if;
 			when LD_BTN_STR =>
 				uartState <= SEND_CHAR;
@@ -474,19 +383,9 @@ begin
 			sendStr(0 to 26) <= WELCOME_STR;
 			strEnd <= WELCOME_STR_LEN;
 		elsif (uartState = LD_BTN_STR) then
-		    if(btnDeBnc(3) = '1') then
-			 sendStr(0 to 63) <= BTND_STR & BTN_START & BTND_SAVE & BTN_END;
-			 strEnd <= 64;
-			elsif (btnDeBnc(0) = '1') then
-			 sendStr(0 to 59) <= BTNU_STR & BTN_START & BTNU_SAVE & BTN_END;
-			 strEnd <= 60;
-		    elsif (btnDeBnc(1) = '1') then
-		      sendStr(0 to 63) <= BTNL_STR & BTN_START & BTNL_SAVE & BTN_END;
-		      strEnd <= 64;
-		    elsif (btnDeBnc(2) = '1') then
-		      sendStr(0 to 65) <= BTNR_STR & BTN_START & BTNR_SAVE & BTN_END;
-		      strEnd <= 66;
-		    end if;
+		    sendStr(0 to 85) <= INTRO & BinString(0 to 3) & SPACE & BinString(4 to 7) &
+		    SPACE & BinString(8 to 11) & SPACE & BinString(12 to 15) & LineBreak & HexValue & Hex(Hex1) & Hex(Hex2) & Hex(Hex3) & Hex(Hex4)& LineBreak;
+		    strEnd <= 86;
 		end if;
 	end if;
 end process;
